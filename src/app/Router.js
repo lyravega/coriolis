@@ -18,6 +18,22 @@ function isStandAlone() {
 }
 
 /**
+ * Creates a debounced version of the provided function that delays invocation
+ * until after a specified time has elapsed since the last call.
+ *
+ * @param {Function} fn Function to debounce
+ * @param {number} delay in ms, default 100
+ * @returns {Function} debounced function
+ */
+function debouncer(fn, delay = 100) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+/**
  * Register path with callback fn(), or route path`, or Router.start().
  *
  *   Router('*', fn);
@@ -50,13 +66,13 @@ Router.start = function() {
     let state = Persist.getState();
     // If a previous state has been stored, load that state
     if (state && state.path) {
-      Router.replace(state.path, null, true);
+      Router._replace(state.path, null, true);
     } else {
-      Router.replace('/', null, true);
+      Router._replace('/', null, true);
     }
   } else {
     let url = location.pathname + location.search;
-    Router.replace(url, null, true);
+    Router._replace(url, null, true);
   }
 };
 
@@ -100,7 +116,7 @@ Router.go = function(path, state) {
  * @return {Context} New Context
  * @api public
  */
-Router.replace = function(path, state, dispatch) {
+Router._replace = function(path, state, dispatch) {
   gaTrack(path);
   let ctx = new Context(path, state);
   if (dispatch) {
@@ -121,6 +137,7 @@ Router.replace = function(path, state, dispatch) {
   }
   return ctx;
 };
+Router.replace = debouncer(Router._replace);	// debouncing to avoid issues with 'history'
 
 /**
  * Dispatch the given `ctx`.
@@ -306,7 +323,7 @@ function pathtoRegexp(path, keys, sensitive, strict) {
 function onpopstate(e) {
   if (e.state) {
     let path = e.state.path;
-    Router.replace(path, e.state, true);
+    Router._replace(path, e.state, true);
   }
 }
 
