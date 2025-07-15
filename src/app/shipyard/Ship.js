@@ -1214,7 +1214,7 @@ export default class Ship {
     this.fuelCapacity = fuelCapacity;
     this.cargoCapacity = cargoCapacity;
     this.passengerCapacity = passengerCapacity;
-	this.outfittedMass = outfittedMass;	// separated from 'unladenMass' and used in place of it to fix a few issues that included fuel twice in calculations
+    this.outfittedMass = outfittedMass;	// separated from 'unladenMass' and used in place of it to fix a few issues that included fuel twice in calculations
     this.unladenMass = outfittedMass + fuelCapacity;
     this.ladenMass = outfittedMass + fuelCapacity + cargoCapacity;
     return this;
